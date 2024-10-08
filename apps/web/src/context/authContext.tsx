@@ -1,4 +1,5 @@
 import {
+  createUserWithEmailAndPassword,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   User,
@@ -11,10 +12,12 @@ export const UserContext = createContext<{
   user: User | null
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
+  register: (email: string, password: string) => Promise<void>
 }>({
   user: null,
   login: async () => {},
   logout: async () => {},
+  register: async () => {},
 })
 
 export const useUser = () => {
@@ -48,6 +51,21 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
     }
   }
 
+  const register = async (email: string, password: string) => {
+    try {
+      await createUserWithEmailAndPassword(firebaseAuth, email, password)
+      toast.success(
+        'Registered successfully! Please check your email to verify your account'
+      )
+      // const user = userCredential.user
+
+      // Send email verification
+      // await sendEmailVerification(user);
+      await logout()
+    } catch (err) {
+      toast.error(err.message)
+    }
+  }
   console.log(isLoading)
 
   useEffect(() => {
@@ -68,7 +86,7 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
   }, [firebaseAuth])
 
   return (
-    <UserContext.Provider value={{ user, login, logout }}>
+    <UserContext.Provider value={{ user, login, logout, register }}>
       {children}
     </UserContext.Provider>
   )
