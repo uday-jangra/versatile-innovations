@@ -3,6 +3,7 @@ import ProtectedRoute from './protectedRoute.tsx'
 import Login from '../pages/Login.tsx'
 import NonProtectedRoutes from './nonProtectedRoutes.tsx'
 import Dashboard from '../pages/Dashboard.tsx'
+import Register from '../pages/Register.tsx'
 
 const router = createBrowserRouter([
   {
@@ -12,6 +13,10 @@ const router = createBrowserRouter([
       {
         path: '/login',
         element: <Login />,
+      },
+      {
+        path: '/register',
+        element: <Register />,
       },
     ],
   },
