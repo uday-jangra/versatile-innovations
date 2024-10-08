@@ -1,5 +1,4 @@
-import * as admin from 'firebase-admin';
-
+import * as admin from 'firebase-admin'
 
 const authMiddleware = async (req, res, next) => {
   const { authorization } = req.headers
@@ -12,7 +11,7 @@ const authMiddleware = async (req, res, next) => {
     req.user = decodedToken
     return next()
   } catch (error) {
-    console.log(error);
+    console.log(error)
     return res.status(401).send('Unauthorized')
   }
 }
