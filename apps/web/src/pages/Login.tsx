@@ -1,25 +1,19 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap'
-import { signInWithEmailAndPassword } from 'firebase/auth'
-import { firebaseAuth } from '../firebase'
+import { UserContext } from '../context/authContext'
 
 function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const context = useContext(UserContext)
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
     setError('')
-
-    try {
-      await signInWithEmailAndPassword(firebaseAuth, email, password)
-    } catch (err) {
-      setError(err.message)
-    }
-
+    context.login(email, password)
     setLoading(false)
   }
 

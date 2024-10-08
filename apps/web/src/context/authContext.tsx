@@ -1,11 +1,20 @@
-import { onAuthStateChanged, User } from 'firebase/auth'
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  User,
+} from 'firebase/auth'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { firebaseAuth } from '../firebase'
+import { toast } from 'react-toastify'
 
 export const UserContext = createContext<{
   user: User | null
+  login: (email: string, password: string) => Promise<void>
+  logout: () => Promise<void>
 }>({
   user: null,
+  login: async () => {},
+  logout: async () => {},
 })
 
 export const useUser = () => {
@@ -21,9 +30,22 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  const login = (user: User) => {
-    setUser(user)
-    setIsLoading(false)
+  const login = async (email: string, password: string) => {
+    try {
+      await signInWithEmailAndPassword(firebaseAuth, email, password)
+      toast.success('Logged in successfully')
+    } catch (err) {
+      toast.error(err.message)
+    }
+  }
+
+  const logout = async () => {
+    try {
+      await firebaseAuth.signOut()
+      toast.success('Logged out successfully')
+    } catch (err) {
+      toast.error(err.message)
+    }
   }
 
   console.log(isLoading)
@@ -33,7 +55,7 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
       setIsLoading(true)
       if (user) {
         console.log('loggedin', user)
-        login(user)
+        setUser(user)
       } else {
         console.log('notloggedin')
         setUser(null)
@@ -46,7 +68,9 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
   }, [firebaseAuth])
 
   return (
-    <UserContext.Provider value={{ user }}>{children}</UserContext.Provider>
+    <UserContext.Provider value={{ user, login, logout }}>
+      {children}
+    </UserContext.Provider>
   )
 }
 
