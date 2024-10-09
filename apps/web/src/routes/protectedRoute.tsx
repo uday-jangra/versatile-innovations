@@ -9,14 +9,24 @@ const ProtectedRoute = () => {
   if (!user) {
     // or you can redirect to a different page and show a message
     return <Navigate to="/login" />
-  }
-  if (!user.emailVerified && !location.pathname.includes('userNotVerified')) {
+  } else if (
+    !user.emailVerified &&
+    !location.pathname.includes('userNotVerified')
+  ) {
     return <Navigate to="/app/userNotVerified" />
   }
   // Check if the user is a first-time user, and if so, redirect to UserDetails page
-
-  if (isFirstTimeUser && !location.pathname.includes('registrationForm')) {
+  else if (
+    user.emailVerified &&
+    isFirstTimeUser &&
+    !location.pathname.includes('registrationForm')
+  ) {
     return <Navigate to="/app/registrationForm" />
+  } else if (
+    !isFirstTimeUser &&
+    location.pathname.includes('registrationForm')
+  ) {
+    return <Navigate to="/app/dashboard" />
   }
   return <Outlet />
 }
