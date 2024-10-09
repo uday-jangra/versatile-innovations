@@ -27,6 +27,7 @@ function VerifyEmail() {
       try {
         await context.verifyEmailCode(code)
       } catch (error) {
+        console.log(error)
         setLoading(false)
       }
     }

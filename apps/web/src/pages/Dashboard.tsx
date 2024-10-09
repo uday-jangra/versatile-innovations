@@ -13,6 +13,11 @@ function Dashboard() {
   return (
     <Container className="mt-5">
       <Row className="justify-content-md-center">
+        <h1>
+          Welcome to the Dashboard{' '}
+          {context.userDetails &&
+            context.userDetails?.firstName + context.userDetails?.lastName}
+        </h1>
         <Button variant="primary" onClick={handleLogout} className="mt-4">
           Signout
         </Button>

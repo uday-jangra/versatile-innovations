@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   applyActionCode,
   createUserWithEmailAndPassword,
@@ -23,7 +25,11 @@ export const UserContext = createContext<{
   sendVerificationEmail: () => Promise<void>
   verifyEmailCode: (code: string) => Promise<void>
   isFirstTimeUser: boolean
-  createUser: (firstName: string, lastName: string, age: number) => Promise<void>
+  createUser: (
+    firstName: string,
+    lastName: string,
+    age: number
+  ) => Promise<void>
 }>({
   user: null,
   userDetails: null,
@@ -47,15 +53,17 @@ export const useUser = () => {
 }
 
 export interface UserDetails {
-  firstName: string;
-  lastName: string;
-  age: number;
+  firstName: string
+  lastName: string
+  age: number
+  points: number
+  score: number
 }
 
 type Props = { children: React.ReactNode }
 export const UserContextProviderWrapper = ({ children }: Props) => {
   const [user, setUser] = useState<User | null>(null)
-  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isVerified, setIsVerified] = useState(false)
   const [isFirstTimeUser, setIsFirstTimeUser] = useState(true)
@@ -158,13 +166,15 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
         }
       )
 
-      console.log(createdUser);
       setUserDetails({
         firstName: createdUser.data.firstName,
         lastName: createdUser.data.lastName,
-        age: createdUser.data.age
+        age: createdUser.data.age,
+        points: createdUser.data.points,
+        score: createdUser.data.score,
       })
-      toast.success("Registration Success")
+      setIsFirstTimeUser(false)
+      toast.success('Registration Success')
     } catch (err: any) {
       console.log(err)
       toast.error(err.message)
@@ -180,12 +190,14 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
         console.log(await user.getIdToken())
         const userDetails = await getUserDetails(user)
         console.log(userDetails)
-        setIsFirstTimeUser(!(userDetails?.data.exists))
-        if(userDetails?.data.exists) {
+        setIsFirstTimeUser(!userDetails?.data.exists)
+        if (userDetails?.data.exists) {
           setUserDetails({
             firstName: userDetails.data.user.firstName,
             lastName: userDetails.data.user.lastName,
-            age: userDetails.data.user.age
+            age: userDetails.data.user.age,
+            points: userDetails.data.user.points,
+            score: userDetails.data.user.score,
           })
         }
       } else {
@@ -216,7 +228,7 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
         isFirstTimeUser,
         sendVerificationEmail,
         verifyEmailCode,
-        createUser
+        createUser,
       }}
     >
       {isLoading ? <Loader /> : children}

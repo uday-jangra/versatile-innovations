@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useContext, useState } from 'react'
 import { Form, Button, Container, Row, Col } from 'react-bootstrap'
 import { UserContext } from '../context/authContext'
@@ -9,7 +10,7 @@ function UserDetailsForm() {
   const [lastName, setLastName] = useState('')
   const [age, setAge] = useState<number>(0)
   const [loading, setLoading] = useState(false)
-  const { user, createUser } = useContext(UserContext)
+  const { createUser } = useContext(UserContext)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -21,7 +22,7 @@ function UserDetailsForm() {
 
     setLoading(true)
     try {
-      await createUser(firstName, lastName, age);
+      await createUser(firstName, lastName, age)
     } catch (error: any) {
       toast.error(`Error saving details: ${error.message}`)
     } finally {
