@@ -7,7 +7,7 @@ function Dashboard() {
 
   const handleLogout = async (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault()
-    context.logout()
+    context.logout(true)
   }
 
   return (

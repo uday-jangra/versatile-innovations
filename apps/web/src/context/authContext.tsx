@@ -1,23 +1,34 @@
 import {
+  applyActionCode,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  sendEmailVerification,
   signInWithEmailAndPassword,
   User,
 } from 'firebase/auth'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { firebaseAuth } from '../firebase'
 import { toast } from 'react-toastify'
+import Loader from '../components/Spinner'
 
 export const UserContext = createContext<{
   user: User | null
   login: (email: string, password: string) => Promise<void>
-  logout: () => Promise<void>
+  logout: (showToast: boolean) => Promise<void>
   register: (email: string, password: string) => Promise<void>
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+  isVerified: boolean
+  sendVerificationEmail: () => Promise<void>
+  verifyEmailCode: (code: string) => Promise<void>
 }>({
   user: null,
   login: async () => {},
   logout: async () => {},
   register: async () => {},
+  setIsLoading: () => {},
+  isVerified: false,
+  sendVerificationEmail: async () => {},
+  verifyEmailCode: async () => {},
 })
 
 export const useUser = () => {
@@ -32,41 +43,68 @@ type Props = { children: React.ReactNode }
 export const UserContextProviderWrapper = ({ children }: Props) => {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-
+  const [isVerified, setIsVerified] = useState(false)
   const login = async (email: string, password: string) => {
     try {
       await signInWithEmailAndPassword(firebaseAuth, email, password)
       toast.success('Logged in successfully')
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.message)
     }
   }
 
-  const logout = async () => {
+  const logout = async (showToast: boolean) => {
     try {
       await firebaseAuth.signOut()
-      toast.success('Logged out successfully')
-    } catch (err) {
+      if (showToast) {
+        toast.success('Logged out successfully')
+      }
+    } catch (err: any) {
+      toast.error(err.message)
+    }
+  }
+
+  const sendVerificationEmail = async () => {
+    try {
+      if (user) {
+        await sendEmailVerification(user)
+        toast.success('Verification email sent')
+      } else {
+        toast.error('User not logged in')
+      }
+    } catch (err: any) {
+      toast.error(err.message)
+    }
+  }
+
+  const verifyEmailCode = async (code: string) => {
+    try {
+      await applyActionCode(firebaseAuth, code)
+      toast.success('Email verified! Login to continue')
+      await logout(false)
+    } catch (err: any) {
       toast.error(err.message)
     }
   }
 
   const register = async (email: string, password: string) => {
     try {
-      await createUserWithEmailAndPassword(firebaseAuth, email, password)
+      const userCredential = await createUserWithEmailAndPassword(
+        firebaseAuth,
+        email,
+        password
+      )
       toast.success(
         'Registered successfully! Please check your email to verify your account'
       )
-      // const user = userCredential.user
+      const user = userCredential.user
 
-      // Send email verification
-      // await sendEmailVerification(user);
-      await logout()
-    } catch (err) {
+      await sendEmailVerification(user)
+    } catch (err: any) {
       toast.error(err.message)
     }
   }
-  console.log(isLoading)
+  console.log(isLoading, isVerified)
 
   useEffect(() => {
     const authStateListener = onAuthStateChanged(firebaseAuth, async (user) => {
@@ -74,10 +112,13 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
       if (user) {
         console.log('loggedin', user)
         setUser(user)
+        setIsVerified(user.emailVerified)
       } else {
         console.log('notloggedin')
         setUser(null)
+        setIsVerified(false)
       }
+      setIsLoading(false)
     })
 
     return () => {
@@ -86,8 +127,19 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
   }, [firebaseAuth])
 
   return (
-    <UserContext.Provider value={{ user, login, logout, register }}>
-      {children}
+    <UserContext.Provider
+      value={{
+        user,
+        login,
+        logout,
+        register,
+        setIsLoading,
+        isVerified,
+        sendVerificationEmail,
+        verifyEmailCode,
+      }}
+    >
+      {isLoading ? <Loader /> : children}
     </UserContext.Provider>
   )
 }
