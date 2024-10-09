@@ -1,8 +1,8 @@
-// src/Register.js
 import { useContext, useState } from 'react'
 import { Form, Button, Container, Row, Col } from 'react-bootstrap'
 import { UserContext } from '../context/authContext'
 import { toast } from 'react-toastify'
+import '../css/loginRegister.css'
 
 function Register() {
   const [email, setEmail] = useState('')
@@ -10,7 +10,8 @@ function Register() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const context = useContext(UserContext)
-  const handleRegister = async (e) => {
+
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (password !== confirmPassword) {
@@ -25,9 +26,9 @@ function Register() {
   }
 
   return (
-    <Container className="mt-5">
+    <Container className="container-full-right">
       <Row className="justify-content-md-center">
-        <Col xs={12} md={6}>
+        <Col className="form-container">
           <h3 className="text-center">Register</h3>
           <Form onSubmit={handleRegister}>
             <Form.Group controlId="formBasicEmail">

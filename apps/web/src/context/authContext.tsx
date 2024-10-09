@@ -7,17 +7,20 @@ import {
 import { createContext, useContext, useEffect, useState } from 'react'
 import { firebaseAuth } from '../firebase'
 import { toast } from 'react-toastify'
+import Loader from '../components/Spinner'
 
 export const UserContext = createContext<{
   user: User | null
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
   register: (email: string, password: string) => Promise<void>
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 }>({
   user: null,
   login: async () => {},
   logout: async () => {},
   register: async () => {},
+  setIsLoading: () => {},
 })
 
 export const useUser = () => {
@@ -37,7 +40,7 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
     try {
       await signInWithEmailAndPassword(firebaseAuth, email, password)
       toast.success('Logged in successfully')
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.message)
     }
   }
@@ -46,7 +49,7 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
     try {
       await firebaseAuth.signOut()
       toast.success('Logged out successfully')
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.message)
     }
   }
@@ -62,7 +65,7 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
       // Send email verification
       // await sendEmailVerification(user);
       await logout()
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.message)
     }
   }
@@ -78,6 +81,7 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
         console.log('notloggedin')
         setUser(null)
       }
+      setIsLoading(false)
     })
 
     return () => {
@@ -86,8 +90,10 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
   }, [firebaseAuth])
 
   return (
-    <UserContext.Provider value={{ user, login, logout, register }}>
-      {children}
+    <UserContext.Provider
+      value={{ user, login, logout, register, setIsLoading }}
+    >
+      {isLoading ? <Loader /> : children}
     </UserContext.Provider>
   )
 }
