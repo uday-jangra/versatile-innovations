@@ -1,4 +1,4 @@
-import * as admin from 'firebase-admin'
+import admin from 'firebase-admin'
 
 const authMiddleware = async (req, res, next) => {
   const { authorization } = req.headers
@@ -6,8 +6,10 @@ const authMiddleware = async (req, res, next) => {
     return res.status(401).send('Unauthorized')
   }
 
+  const token = authorization.split(' ')[1]
+  console.log(token, 'TOKEN HERE')
   try {
-    const decodedToken = await admin.auth().verifyIdToken(authorization)
+    const decodedToken = await admin.auth().verifyIdToken(token)
     req.user = decodedToken
     return next()
   } catch (error) {

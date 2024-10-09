@@ -6,6 +6,7 @@ import Dashboard from '../pages/Dashboard.tsx'
 import Register from '../pages/Register.tsx'
 import VerificationPage from '../pages/VerificationPage.tsx'
 import VerifyEmail from '../pages/VerifyEmail.tsx'
+import UserDetailsForm from '../pages/UserDetailsForm.tsx'
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
       {
         path: 'userNotVerified',
         element: <VerificationPage />,
+      },
+      {
+        path: 'registrationForm',
+        element: <UserDetailsForm />,
       },
       {
         path: 'dashboard',

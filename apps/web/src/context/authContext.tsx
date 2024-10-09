@@ -10,9 +10,11 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { firebaseAuth } from '../firebase'
 import { toast } from 'react-toastify'
 import Loader from '../components/Spinner'
+import axios from 'axios'
 
 export const UserContext = createContext<{
   user: User | null
+  userDetails: UserDetails | null
   login: (email: string, password: string) => Promise<void>
   logout: (showToast: boolean) => Promise<void>
   register: (email: string, password: string) => Promise<void>
@@ -20,8 +22,11 @@ export const UserContext = createContext<{
   isVerified: boolean
   sendVerificationEmail: () => Promise<void>
   verifyEmailCode: (code: string) => Promise<void>
+  isFirstTimeUser: boolean
+  createUser: (firstName: string, lastName: string, age: number) => Promise<void>
 }>({
   user: null,
+  userDetails: null,
   login: async () => {},
   logout: async () => {},
   register: async () => {},
@@ -29,6 +34,8 @@ export const UserContext = createContext<{
   isVerified: false,
   sendVerificationEmail: async () => {},
   verifyEmailCode: async () => {},
+  isFirstTimeUser: true,
+  createUser: async () => {},
 })
 
 export const useUser = () => {
@@ -39,11 +46,19 @@ export const useUser = () => {
   return context
 }
 
+export interface UserDetails {
+  firstName: string;
+  lastName: string;
+  age: number;
+}
+
 type Props = { children: React.ReactNode }
 export const UserContextProviderWrapper = ({ children }: Props) => {
   const [user, setUser] = useState<User | null>(null)
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true)
   const [isVerified, setIsVerified] = useState(false)
+  const [isFirstTimeUser, setIsFirstTimeUser] = useState(true)
   const login = async (email: string, password: string) => {
     try {
       await signInWithEmailAndPassword(firebaseAuth, email, password)
@@ -104,8 +119,57 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
       toast.error(err.message)
     }
   }
-  console.log(isLoading, isVerified)
 
+  const getUserDetails = async (user: User) => {
+    try {
+      const userDetails = await axios.get(
+        import.meta.env.VITE_API_URL + 'auth/user',
+        {
+          headers: {
+            Authorization: `Bearer ${await user?.getIdToken()}`,
+          },
+        }
+      )
+
+      return userDetails
+    } catch (err: any) {
+      console.log(err)
+      toast.error(err.message)
+    }
+  }
+
+  const createUser = async (
+    firstName: string,
+    lastName: string,
+    age: number
+  ) => {
+    try {
+      const createdUser = await axios.post(
+        import.meta.env.VITE_API_URL + 'auth/createUser',
+        {
+          firstName,
+          lastName,
+          age,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${await user?.getIdToken()}`,
+          },
+        }
+      )
+
+      console.log(createdUser);
+      setUserDetails({
+        firstName: createdUser.data.firstName,
+        lastName: createdUser.data.lastName,
+        age: createdUser.data.age
+      })
+      toast.success("Registration Success")
+    } catch (err: any) {
+      console.log(err)
+      toast.error(err.message)
+    }
+  }
   useEffect(() => {
     const authStateListener = onAuthStateChanged(firebaseAuth, async (user) => {
       setIsLoading(true)
@@ -113,6 +177,17 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
         console.log('loggedin', user)
         setUser(user)
         setIsVerified(user.emailVerified)
+        console.log(await user.getIdToken())
+        const userDetails = await getUserDetails(user)
+        console.log(userDetails)
+        setIsFirstTimeUser(!(userDetails?.data.exists))
+        if(userDetails?.data.exists) {
+          setUserDetails({
+            firstName: userDetails.data.user.firstName,
+            lastName: userDetails.data.user.lastName,
+            age: userDetails.data.user.age
+          })
+        }
       } else {
         console.log('notloggedin')
         setUser(null)
@@ -126,17 +201,22 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
     }
   }, [firebaseAuth])
 
+  console.log(isFirstTimeUser, 'FIRSTTIME')
+
   return (
     <UserContext.Provider
       value={{
         user,
+        userDetails,
         login,
         logout,
         register,
         setIsLoading,
         isVerified,
+        isFirstTimeUser,
         sendVerificationEmail,
         verifyEmailCode,
+        createUser
       }}
     >
       {isLoading ? <Loader /> : children}
