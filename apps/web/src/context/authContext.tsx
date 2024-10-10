@@ -8,7 +8,13 @@ import {
   signInWithEmailAndPassword,
   User,
 } from 'firebase/auth'
-import { createContext, useContext, useEffect, useState } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
 import { firebaseAuth } from '../firebase'
 import { toast } from 'react-toastify'
 import Loader from '../components/Spinner'
@@ -21,7 +27,6 @@ export const UserContext = createContext<{
   logout: (showToast: boolean) => Promise<void>
   register: (email: string, password: string) => Promise<void>
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
-  isVerified: boolean
   sendVerificationEmail: () => Promise<void>
   verifyEmailCode: (code: string) => Promise<void>
   isFirstTimeUser: boolean
@@ -37,7 +42,6 @@ export const UserContext = createContext<{
   logout: async () => {},
   register: async () => {},
   setIsLoading: () => {},
-  isVerified: false,
   sendVerificationEmail: async () => {},
   verifyEmailCode: async () => {},
   isFirstTimeUser: true,
@@ -65,18 +69,17 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
   const [user, setUser] = useState<User | null>(null)
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [isVerified, setIsVerified] = useState(false)
   const [isFirstTimeUser, setIsFirstTimeUser] = useState(true)
-  const login = async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string) => {
     try {
       await signInWithEmailAndPassword(firebaseAuth, email, password)
       toast.success('Logged in successfully')
     } catch (err: any) {
       toast.error(err.message)
     }
-  }
+  }, [])
 
-  const logout = async (showToast: boolean) => {
+  const logout = useCallback(async (showToast: boolean) => {
     try {
       await firebaseAuth.signOut()
       if (showToast) {
@@ -85,9 +88,9 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
     } catch (err: any) {
       toast.error(err.message)
     }
-  }
+  }, [])
 
-  const sendVerificationEmail = async () => {
+  const sendVerificationEmail = useCallback(async () => {
     try {
       if (user) {
         await sendEmailVerification(user)
@@ -98,19 +101,24 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
     } catch (err: any) {
       toast.error(err.message)
     }
-  }
+  }, [user])
+  console.log('authContextRe-render')
+  const verifyEmailCode = useCallback(
+    async (code: string) => {
+      try {
+        await applyActionCode(firebaseAuth, code)
+        toast.success('Email verified! Login to continue')
+        await logout(false)
+      } catch (err: any) {
+        console.log('recalled')
+        toast.error(err.message)
+        throw err
+      }
+    },
+    [logout]
+  )
 
-  const verifyEmailCode = async (code: string) => {
-    try {
-      await applyActionCode(firebaseAuth, code)
-      toast.success('Email verified! Login to continue')
-      await logout(false)
-    } catch (err: any) {
-      toast.error(err.message)
-    }
-  }
-
-  const register = async (email: string, password: string) => {
+  const register = useCallback(async (email: string, password: string) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         firebaseAuth,
@@ -126,9 +134,9 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
     } catch (err: any) {
       toast.error(err.message)
     }
-  }
+  }, [])
 
-  const getUserDetails = async (user: User) => {
+  const getUserDetails = useCallback(async (user: User) => {
     try {
       const userDetails = await axios.get(
         import.meta.env.VITE_API_URL + 'auth/user',
@@ -144,50 +152,47 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
       console.log(err)
       toast.error(err.message)
     }
-  }
+  }, [])
 
-  const createUser = async (
-    firstName: string,
-    lastName: string,
-    age: number
-  ) => {
-    try {
-      const createdUser = await axios.post(
-        import.meta.env.VITE_API_URL + 'auth/createUser',
-        {
-          firstName,
-          lastName,
-          age,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${await user?.getIdToken()}`,
+  const createUser = useCallback(
+    async (firstName: string, lastName: string, age: number) => {
+      try {
+        const createdUser = await axios.post(
+          import.meta.env.VITE_API_URL + 'auth/createUser',
+          {
+            firstName,
+            lastName,
+            age,
           },
-        }
-      )
+          {
+            headers: {
+              Authorization: `Bearer ${await user?.getIdToken()}`,
+            },
+          }
+        )
 
-      setUserDetails({
-        firstName: createdUser.data.firstName,
-        lastName: createdUser.data.lastName,
-        age: createdUser.data.age,
-        points: createdUser.data.points,
-        score: createdUser.data.score,
-      })
-      setIsFirstTimeUser(false)
-      toast.success('Registration Success')
-    } catch (err: any) {
-      console.log(err)
-      toast.error(err.message)
-    }
-  }
+        setUserDetails({
+          firstName: createdUser.data.firstName,
+          lastName: createdUser.data.lastName,
+          age: createdUser.data.age,
+          points: createdUser.data.points,
+          score: createdUser.data.score,
+        })
+        setIsFirstTimeUser(false)
+        toast.success('Registration Success')
+      } catch (err: any) {
+        console.log(err)
+        toast.error(err.message)
+      }
+    },
+    [user]
+  )
   useEffect(() => {
     const authStateListener = onAuthStateChanged(firebaseAuth, async (user) => {
       setIsLoading(true)
       if (user) {
         console.log('loggedin', user)
         setUser(user)
-        setIsVerified(user.emailVerified)
-        console.log(await user.getIdToken())
         const userDetails = await getUserDetails(user)
         console.log(userDetails)
         setIsFirstTimeUser(!userDetails?.data.exists)
@@ -203,7 +208,6 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
       } else {
         console.log('notloggedin')
         setUser(null)
-        setIsVerified(false)
       }
       setIsLoading(false)
     })
@@ -211,7 +215,7 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
     return () => {
       authStateListener()
     }
-  }, [firebaseAuth])
+  }, [getUserDetails])
 
   console.log(isFirstTimeUser, 'FIRSTTIME')
 
@@ -224,7 +228,6 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
         logout,
         register,
         setIsLoading,
-        isVerified,
         isFirstTimeUser,
         sendVerificationEmail,
         verifyEmailCode,

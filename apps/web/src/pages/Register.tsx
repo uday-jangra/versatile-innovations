@@ -1,9 +1,17 @@
 import { useContext, useState } from 'react'
-import { Form, Button, Container, Row, Col } from 'react-bootstrap'
+import {
+  Form,
+  Button,
+  Container,
+  Row,
+  Col,
+  FloatingLabel,
+} from 'react-bootstrap'
 import { UserContext } from '../context/authContext'
 import '../css/loginRegister.css'
 import { Formik } from 'formik'
 import registerSchema from '../schemas/registerSchema'
+import { Link } from 'react-router-dom'
 
 interface RegisterFormValues {
   email: string
@@ -41,59 +49,68 @@ function Register() {
             }) => (
               <Form noValidate onSubmit={handleSubmit}>
                 <Form.Group controlId="formBasicEmail">
-                  <Form.Label>Email address</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="Enter email"
-                    name="email"
-                    value={values.email}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    isInvalid={touched.email && !!errors.email}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.email}
-                  </Form.Control.Feedback>
+                  <FloatingLabel
+                    controlId="floatingInput"
+                    label="Email Address"
+                  >
+                    <Form.Control
+                      type="email"
+                      placeholder="Enter email"
+                      name="email"
+                      value={values.email}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      isInvalid={touched.email && !!errors.email}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.email}
+                    </Form.Control.Feedback>
+                  </FloatingLabel>
                 </Form.Group>
 
                 <Form.Group controlId="formBasicPassword" className="mt-3">
-                  <Form.Label>Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Password"
-                    name="password"
-                    value={values.password}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    isInvalid={touched.password && !!errors.password}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.password}
-                  </Form.Control.Feedback>
+                  <FloatingLabel controlId="floatingInput" label="Password">
+                    <Form.Control
+                      type="password"
+                      placeholder="Password"
+                      name="password"
+                      value={values.password}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      isInvalid={touched.password && !!errors.password}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.password}
+                    </Form.Control.Feedback>
+                  </FloatingLabel>
                 </Form.Group>
 
                 <Form.Group controlId="formConfirmPassword" className="mt-3">
-                  <Form.Label>Confirm Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Confirm Password"
-                    name="confirmPassword"
-                    value={values.confirmPassword}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    isInvalid={
-                      touched.confirmPassword && !!errors.confirmPassword
-                    }
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.confirmPassword}
-                  </Form.Control.Feedback>
+                  <FloatingLabel
+                    controlId="floatingInput"
+                    label="Confirm Password"
+                  >
+                    <Form.Control
+                      type="password"
+                      placeholder="Confirm Password"
+                      name="confirmPassword"
+                      value={values.confirmPassword}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      isInvalid={
+                        touched.confirmPassword && !!errors.confirmPassword
+                      }
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.confirmPassword}
+                    </Form.Control.Feedback>
+                  </FloatingLabel>
                 </Form.Group>
 
                 <Button
                   variant="primary"
                   type="submit"
-                  className="mt-4"
+                  className="mt-4 w-100"
                   disabled={loading}
                 >
                   {loading ? 'Registering...' : 'Register'}
@@ -101,6 +118,11 @@ function Register() {
               </Form>
             )}
           </Formik>
+          <Container className="mt-2" style={{ textAlign: 'center' }}>
+            <p>
+              Already Registered? <Link to="/login">Login</Link>
+            </p>
+          </Container>
         </Col>
       </Row>
     </Container>

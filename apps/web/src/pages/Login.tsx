@@ -1,9 +1,17 @@
 import { useContext, useState } from 'react'
-import { Form, Button, Container, Row, Col } from 'react-bootstrap'
+import {
+  Form,
+  Button,
+  Container,
+  Row,
+  Col,
+  FloatingLabel,
+} from 'react-bootstrap'
 import { UserContext } from '../context/authContext'
 import { Formik } from 'formik'
 import '../css/loginRegister.css'
 import loginSchema from '../schemas/loginSchema'
+import { Link } from 'react-router-dom'
 
 // Define the types for form values
 interface LoginFormValues {
@@ -41,35 +49,40 @@ function Login() {
             }) => (
               <Form noValidate onSubmit={handleSubmit}>
                 <Form.Group controlId="formBasicEmail">
-                  <Form.Label>Email address</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="Enter email"
-                    name="email"
-                    value={values.email}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    isInvalid={touched.email && !!errors.email}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.email}
-                  </Form.Control.Feedback>
+                  <FloatingLabel
+                    controlId="floatingInput"
+                    label="Email Address"
+                  >
+                    <Form.Control
+                      type="email"
+                      placeholder="Enter email"
+                      name="email"
+                      value={values.email}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      isInvalid={touched.email && !!errors.email}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.email}
+                    </Form.Control.Feedback>
+                  </FloatingLabel>
                 </Form.Group>
 
                 <Form.Group controlId="formBasicPassword" className="mt-3">
-                  <Form.Label>Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Password"
-                    name="password"
-                    value={values.password}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    isInvalid={touched.password && !!errors.password}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.password}
-                  </Form.Control.Feedback>
+                  <FloatingLabel controlId="floatingInput" label="Password">
+                    <Form.Control
+                      type="password"
+                      placeholder="Password"
+                      name="password"
+                      value={values.password}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      isInvalid={touched.password && !!errors.password}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.password}
+                    </Form.Control.Feedback>
+                  </FloatingLabel>
                 </Form.Group>
 
                 <Button
@@ -83,6 +96,13 @@ function Login() {
               </Form>
             )}
           </Formik>
+          <Container style={{ textAlign: 'center' }}>
+            <p>
+              New User? <Link to="/register">Register Now</Link>
+              <br />
+              <Link to="#">Forgot Password</Link>
+            </p>
+          </Container>
         </Col>
       </Row>
     </Container>
