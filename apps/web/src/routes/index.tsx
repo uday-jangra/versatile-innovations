@@ -7,6 +7,7 @@ import Register from '../pages/Register.tsx'
 import VerificationPage from '../pages/VerificationPage.tsx'
 import VerifyEmail from '../pages/VerifyEmail.tsx'
 import UserDetailsForm from '../pages/UserDetailsForm.tsx'
+import ForgotPassword from '../pages/ForgotPassword.tsx'
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
       {
         path: '/register',
         element: <Register />,
+      },
+      {
+        path: '/forgot-password',
+        element: <ForgotPassword />,
       },
     ],
   },

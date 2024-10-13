@@ -5,6 +5,7 @@ import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   sendEmailVerification,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   User,
 } from 'firebase/auth'
@@ -26,6 +27,7 @@ export const UserContext = createContext<{
   login: (email: string, password: string) => Promise<void>
   logout: (showToast: boolean) => Promise<void>
   register: (email: string, password: string) => Promise<void>
+  resetPassword: (email: string) => Promise<void>
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
   sendVerificationEmail: () => Promise<void>
   verifyEmailCode: (code: string) => Promise<void>
@@ -41,6 +43,7 @@ export const UserContext = createContext<{
   login: async () => {},
   logout: async () => {},
   register: async () => {},
+  resetPassword: async () => {},
   setIsLoading: () => {},
   sendVerificationEmail: async () => {},
   verifyEmailCode: async () => {},
@@ -65,11 +68,13 @@ export interface UserDetails {
 }
 
 type Props = { children: React.ReactNode }
+
 export const UserContextProviderWrapper = ({ children }: Props) => {
   const [user, setUser] = useState<User | null>(null)
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isFirstTimeUser, setIsFirstTimeUser] = useState(true)
+
   const login = useCallback(async (email: string, password: string) => {
     try {
       await signInWithEmailAndPassword(firebaseAuth, email, password)
@@ -90,6 +95,15 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
     }
   }, [])
 
+  const resetPassword = useCallback(async (email: string) => {
+    try {
+      await sendPasswordResetEmail(firebaseAuth, email);
+      toast.success('Password reset link sent successfuly.')
+    } catch (err: any) {
+      toast.error(err.message)
+    }
+  }, [])
+
   const sendVerificationEmail = useCallback(async () => {
     try {
       if (user) {
@@ -102,7 +116,7 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
       toast.error(err.message)
     }
   }, [user])
-  console.log('authContextRe-render')
+
   const verifyEmailCode = useCallback(
     async (code: string) => {
       try {
@@ -227,6 +241,7 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
         login,
         logout,
         register,
+        resetPassword,
         setIsLoading,
         isFirstTimeUser,
         sendVerificationEmail,

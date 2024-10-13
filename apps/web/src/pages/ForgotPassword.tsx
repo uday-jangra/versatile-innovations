@@ -10,22 +10,19 @@ import {
 import { UserContext } from '../context/authContext'
 import { Formik } from 'formik'
 import '../css/loginRegister.css'
-import loginSchema from '../schemas/loginSchema'
-import { Link } from 'react-router-dom'
 
-// Define the types for form values
-interface LoginFormValues {
+interface RESET_PASSWORD {
   email: string
-  password: string
 }
 
-function Login() {
+function ForgotPassword() {
   const [loading, setLoading] = useState(false)
   const context = useContext(UserContext)
 
-  const handleLogin = async (values: LoginFormValues) => {
+  const handleForgotPassword = async (values: RESET_PASSWORD) => {
+    console.log("reached here")
     setLoading(true)
-    await context.login(values.email, values.password)
+    await context.resetPassword(values.email)
     setLoading(false)
   }
 
@@ -33,11 +30,10 @@ function Login() {
     <Container className="container-full-right">
       <Row className="justify-content-md-center">
         <Col className="form-container">
-          <h3 className="text-center mb-4">Login</h3>
+          <h3 className="text-center mb-4">Forgot Password</h3>
           <Formik
-            initialValues={{ email: '', password: '' }}
-            validationSchema={loginSchema}
-            onSubmit={(values) => handleLogin(values)}
+            initialValues={{ email: '' }}
+            onSubmit={(values) => handleForgotPassword(values)}
           >
             {({
               handleSubmit,
@@ -68,45 +64,21 @@ function Login() {
                   </FloatingLabel>
                 </Form.Group>
 
-                <Form.Group controlId="formBasicPassword" className="mt-3">
-                  <FloatingLabel controlId="floatingInput" label="Password">
-                    <Form.Control
-                      type="password"
-                      placeholder="Password"
-                      name="password"
-                      value={values.password}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      isInvalid={touched.password && !!errors.password}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {errors.password}
-                    </Form.Control.Feedback>
-                  </FloatingLabel>
-                </Form.Group>
-
                 <Button
                   variant="primary"
                   type="submit"
                   className="mt-4 w-100"
                   disabled={loading}
                 >
-                  {loading ? 'Logging in...' : 'Login'}
+                  Send reset link!
                 </Button>
               </Form>
             )}
           </Formik>
-          <Container style={{ textAlign: 'center' }}>
-            <p>
-              New User? <Link to="/register">Register Now</Link>
-              <br />
-              <Link to="/forgot-password">Forgot Password</Link>
-            </p>
-          </Container>
         </Col>
       </Row>
     </Container>
   )
 }
 
-export default Login
+export default ForgotPassword;
