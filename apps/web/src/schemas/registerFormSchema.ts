@@ -1,4 +1,4 @@
-import * as Yup from 'yup';
+import * as Yup from 'yup'
 
 const registerFormSchema = Yup.object().shape({
   firstName: Yup.string().required('First Name is required'),
@@ -8,6 +8,6 @@ const registerFormSchema = Yup.object().shape({
     .positive('Age must be a positive number')
     .min(3, 'You must be at least 3 years old')
     .integer('Age must be a valid number'),
-});
+})
 
-export default registerFormSchema;
+export default registerFormSchema
