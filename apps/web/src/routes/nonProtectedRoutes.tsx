@@ -26,7 +26,8 @@ const NonProtectedRoutes = () => {
   }
   if (
     location.pathname.includes('/login') ||
-    location.pathname.includes('/register')
+    location.pathname.includes('/register') ||
+    location.pathname.includes('/forgot-password')
   ) {
     return (
       <LoginRegisterContainer>

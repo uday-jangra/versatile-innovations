@@ -5,8 +5,10 @@ import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   sendEmailVerification,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   User,
+  verifyPasswordResetCode,
 } from 'firebase/auth'
 import {
   createContext,
@@ -19,6 +21,7 @@ import { firebaseAuth } from '../firebase'
 import { toast } from 'react-toastify'
 import Loader from '../components/Spinner'
 import axios from 'axios'
+import { FirebaseError } from 'firebase/app'
 
 export const UserContext = createContext<{
   user: User | null
@@ -26,9 +29,11 @@ export const UserContext = createContext<{
   login: (email: string, password: string) => Promise<void>
   logout: (showToast: boolean) => Promise<void>
   register: (email: string, password: string) => Promise<void>
+  resetPassword: (email: string) => Promise<void>
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
   sendVerificationEmail: () => Promise<void>
   verifyEmailCode: (code: string) => Promise<void>
+  verifyResetCode: (code: string) => Promise<void>
   isFirstTimeUser: boolean
   createUser: (
     firstName: string,
@@ -41,9 +46,11 @@ export const UserContext = createContext<{
   login: async () => {},
   logout: async () => {},
   register: async () => {},
+  resetPassword: async () => {},
   setIsLoading: () => {},
   sendVerificationEmail: async () => {},
   verifyEmailCode: async () => {},
+  verifyResetCode: async () => {},
   isFirstTimeUser: true,
   createUser: async () => {},
 })
@@ -65,17 +72,32 @@ export interface UserDetails {
 }
 
 type Props = { children: React.ReactNode }
+
 export const UserContextProviderWrapper = ({ children }: Props) => {
   const [user, setUser] = useState<User | null>(null)
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isFirstTimeUser, setIsFirstTimeUser] = useState(true)
+
   const login = useCallback(async (email: string, password: string) => {
     try {
       await signInWithEmailAndPassword(firebaseAuth, email, password)
       toast.success('Logged in successfully')
-    } catch (err: any) {
-      toast.error(err.message)
+    } catch (err) {
+      if (err instanceof FirebaseError) {
+        if (err.code === 'auth/user-not-found') {
+          toast.error('Wrong Credentails')
+        } else if (err.code === 'auth/wrong-password') {
+          toast.error('Wrong Credentails')
+        } else if (err.code === 'auth/invalid-credential') {
+          toast.error('Invalid Credentails')
+        } else {
+          toast.error(err.message)
+        }
+      } else {
+        console.log(err)
+        toast.error('An error occurred. Please try again later.')
+      }
     }
   }, [])
 
@@ -90,6 +112,22 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
     }
   }, [])
 
+  const resetPassword = useCallback(async (email: string) => {
+    try {
+      await sendPasswordResetEmail(firebaseAuth, email)
+      toast.success('Password reset link sent successfuly if registered.')
+    } catch (err) {
+      if (err instanceof FirebaseError) {
+        if (err.code === 'auth/user-not-found') {
+          toast.success('Password reset link sent successfuly if registered.')
+        } else {
+          toast.error('An error occurred. Please try again later.')
+          throw err
+        }
+      }
+    }
+  }, [])
+
   const sendVerificationEmail = useCallback(async () => {
     try {
       if (user) {
@@ -97,22 +135,59 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
         toast.success('Verification email sent')
       } else {
         toast.error('User not logged in')
+        throw new Error('User not logged in')
       }
     } catch (err: any) {
       toast.error(err.message)
+      throw err
     }
   }, [user])
-  console.log('authContextRe-render')
+
   const verifyEmailCode = useCallback(
     async (code: string) => {
       try {
         await applyActionCode(firebaseAuth, code)
         toast.success('Email verified! Login to continue')
         await logout(false)
+      } catch (err) {
+        if (err instanceof FirebaseError) {
+          if (err.code === 'auth/expired-action-code') {
+            toast.error('The code is expired. Please request a new one.')
+            throw err
+          }
+          if (err.code === 'auth/invalid-action-code') {
+            toast.error('Invalid code provided')
+            throw err
+          }
+        } else {
+          toast.error('An error occurred. Please try again later.')
+          throw err
+        }
+      }
+    },
+    [logout]
+  )
+
+  const verifyResetCode = useCallback(
+    async (code: string) => {
+      try {
+        await verifyPasswordResetCode(firebaseAuth, code)
+        await logout(false)
+        toast.success('Code Verified! Please enter new password')
       } catch (err: any) {
-        console.log('recalled')
-        toast.error(err.message)
-        throw err
+        if (err instanceof FirebaseError) {
+          if (err.code === 'auth/expired-action-code') {
+            toast.error('The code is expired. Please request a new one.')
+            throw err
+          }
+          if (err.code === 'auth/invalid-action-code') {
+            toast.error('Invalid code provided')
+            throw err
+          }
+        } else {
+          toast.error('An error occurred. Please try again later.')
+          throw err
+        }
       }
     },
     [logout]
@@ -131,8 +206,15 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
       const user = userCredential.user
 
       await sendEmailVerification(user)
-    } catch (err: any) {
-      toast.error(err.message)
+    } catch (err) {
+      if (err instanceof FirebaseError) {
+        if (err.code === 'auth/email-already-in-use') {
+          toast.error('Email already in use')
+          throw err
+        } else {
+          toast.error('An error occurred. Please try again later.')
+        }
+      }
     }
   }, [])
 
@@ -227,11 +309,13 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
         login,
         logout,
         register,
+        resetPassword,
         setIsLoading,
         isFirstTimeUser,
         sendVerificationEmail,
         verifyEmailCode,
         createUser,
+        verifyResetCode,
       }}
     >
       {isLoading ? <Loader /> : children}
