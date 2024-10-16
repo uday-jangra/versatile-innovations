@@ -10,19 +10,26 @@ import {
 import { UserContext } from '../context/authContext'
 import { Formik } from 'formik'
 import '../css/loginRegister.css'
+import * as Yup from 'yup'
+import { useNavigate } from 'react-router'
 
-interface RESET_PASSWORD {
+interface IResetPassword {
   email: string
 }
 
 function ForgotPassword() {
   const [loading, setLoading] = useState(false)
   const context = useContext(UserContext)
+  const navigate = useNavigate()
 
-  const handleForgotPassword = async (values: RESET_PASSWORD) => {
-    console.log("reached here")
+  const handleForgotPassword = async (values: IResetPassword) => {
     setLoading(true)
-    await context.resetPassword(values.email)
+    try {
+      await context.resetPassword(values.email)
+      navigate('/login')
+    } catch (error: any) {
+      console.error('Error sending reset link: ', error)
+    }
     setLoading(false)
   }
 
@@ -33,7 +40,12 @@ function ForgotPassword() {
           <h3 className="text-center mb-4">Forgot Password</h3>
           <Formik
             initialValues={{ email: '' }}
-            onSubmit={(values) => handleForgotPassword(values)}
+            validationSchema={Yup.object().shape({
+              email: Yup.string()
+                .email('Invalid email address')
+                .required('Email is required'),
+            })}
+            onSubmit={handleForgotPassword}
           >
             {({
               handleSubmit,
@@ -81,4 +93,4 @@ function ForgotPassword() {
   )
 }
 
-export default ForgotPassword;
+export default ForgotPassword

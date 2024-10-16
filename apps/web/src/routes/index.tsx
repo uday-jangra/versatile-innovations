@@ -5,14 +5,14 @@ import NonProtectedRoutes from './nonProtectedRoutes.tsx'
 import Dashboard from '../pages/Dashboard.tsx'
 import Register from '../pages/Register.tsx'
 import VerificationPage from '../pages/VerificationPage.tsx'
-import VerifyEmail from '../pages/VerifyEmail.tsx'
 import UserDetailsForm from '../pages/UserDetailsForm.tsx'
 import ForgotPassword from '../pages/ForgotPassword.tsx'
+import Verify from '../pages/Verify.tsx'
 
 const router = createBrowserRouter([
   {
     path: '/verify',
-    element: <VerifyEmail />,
+    element: <Verify />,
   },
   {
     path: '/',
