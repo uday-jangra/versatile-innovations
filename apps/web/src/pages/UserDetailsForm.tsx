@@ -8,7 +8,6 @@ import {
   FloatingLabel,
 } from 'react-bootstrap'
 import { UserContext } from '../context/authContext'
-import { toast } from 'react-toastify'
 import '../css/loginRegister.css'
 import { Formik } from 'formik'
 import registerFormSchema from '../schemas/registerFormSchema'
@@ -25,20 +24,18 @@ function UserDetailsForm() {
 
   const handleSubmit = async (values: RegisterFormValues) => {
     setLoading(true)
-    try {
-      await createUser(values.firstName, values.lastName, values.age)
-    } catch (error: any) {
-      toast.error(`Error saving details: ${error.message}`)
-    } finally {
-      setLoading(false)
-    }
+
+    await createUser(values.firstName, values.lastName, values.age)
+    setLoading(false)
   }
 
   return (
-    <Container className="container-full-right">
-      <Row className="justify-content-md-center">
+    <Container fluid className="container-full-right">
+      <Row className="justify-content-md-center" style={{ width: '60%' }}>
         <Col className="form-container">
-          <h3 className="text-center">User Details</h3>
+          <h3 className="text-center">Welcome Back</h3>
+          <p className="text-center mb-4">Enter your details to continue</p>
+
           <Formik
             initialValues={{ firstName: '', lastName: '', age: 0 }}
             validationSchema={registerFormSchema}
@@ -59,6 +56,7 @@ function UserDetailsForm() {
                       type="text"
                       placeholder="Enter First Name"
                       name="firstName"
+                      className="input-custom"
                       value={values.firstName}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -76,6 +74,7 @@ function UserDetailsForm() {
                       type="text"
                       placeholder="Enter Last Name"
                       name="lastName"
+                      className="input-custom"
                       value={values.lastName}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -93,6 +92,7 @@ function UserDetailsForm() {
                       type="number"
                       placeholder="Enter Age"
                       name="age"
+                      className="input-custom"
                       value={values.age}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -105,12 +105,12 @@ function UserDetailsForm() {
                 </Form.Group>
 
                 <Button
-                  variant="primary"
+                  className="mt-4 w-100 btn-custom"
+                  variant="custom"
                   type="submit"
-                  className="mt-4 w-100"
                   disabled={loading}
                 >
-                  {loading ? 'Saving...' : 'Save Details'}
+                  {loading ? 'Saving...' : 'Complete Registration'}
                 </Button>
               </Form>
             )}

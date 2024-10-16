@@ -30,10 +30,11 @@ function Register() {
   }
 
   return (
-    <Container className="container-full-right">
-      <Row className="justify-content-md-center">
+    <Container fluid className="container-full-right">
+      <Row className="justify-content-md-center" style={{ width: '80%' }}>
         <Col className="form-container">
-          <h3 className="text-center">Register</h3>
+          <h3 className="text-center mb-4">Welcome!</h3>
+          <p className="text-center mb-4">Enter your details to register</p>
           <Formik
             initialValues={{ email: '', password: '', confirmPassword: '' }}
             validationSchema={registerSchema}
@@ -57,6 +58,7 @@ function Register() {
                       type="email"
                       placeholder="Enter email"
                       name="email"
+                      className="input-custom"
                       value={values.email}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -74,6 +76,7 @@ function Register() {
                       type="password"
                       placeholder="Password"
                       name="password"
+                      className="input-custom"
                       value={values.password}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -92,6 +95,7 @@ function Register() {
                   >
                     <Form.Control
                       type="password"
+                      className="input-custom"
                       placeholder="Confirm Password"
                       name="confirmPassword"
                       value={values.confirmPassword}
@@ -108,9 +112,9 @@ function Register() {
                 </Form.Group>
 
                 <Button
-                  variant="primary"
+                  className="mt-4 w-100 btn-custom"
+                  variant="custom"
                   type="submit"
-                  className="mt-4 w-100"
                   disabled={loading}
                 >
                   {loading ? 'Registering...' : 'Register'}
@@ -118,10 +122,19 @@ function Register() {
               </Form>
             )}
           </Formik>
-          <Container className="mt-2" style={{ textAlign: 'center' }}>
-            <p>
-              Already Registered? <Link to="/login">Login</Link>
-            </p>
+          <Container
+            fluid
+            className="mt-3"
+            style={{
+              textAlign: 'center',
+              display: 'flex',
+              padding: '0',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Link style={{ textDecoration: 'none' }} to="/login">
+              Already have an account? Login
+            </Link>
           </Container>
         </Col>
       </Row>

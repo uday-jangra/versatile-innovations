@@ -5,6 +5,8 @@ import AuthContextProvider from './context/authContext.tsx'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import './App.css'
+import './css/button.css'
 
 createRoot(document.getElementById('root')!).render(
   <AuthContextProvider>
