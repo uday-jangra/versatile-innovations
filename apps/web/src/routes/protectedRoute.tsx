@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { UserContext, useUser } from '../context/authContext'
 import { useContext } from 'react'
+import NavbarWithAvatar from '../components/Navbar'
 
 const ProtectedRoute = () => {
   const { user } = useUser()
@@ -28,7 +29,12 @@ const ProtectedRoute = () => {
   ) {
     return <Navigate to="/app/dashboard" />
   }
-  return <Outlet />
+  return (
+    <>
+      <NavbarWithAvatar />
+      <Outlet />
+    </>
+  )
 }
 
 export default ProtectedRoute

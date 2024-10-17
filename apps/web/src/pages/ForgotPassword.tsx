@@ -12,6 +12,7 @@ import { Formik } from 'formik'
 import '../css/loginRegister.css'
 import * as Yup from 'yup'
 import { useNavigate } from 'react-router'
+import { Link } from 'react-router-dom'
 
 interface IResetPassword {
   email: string
@@ -27,15 +28,15 @@ function ForgotPassword() {
     try {
       await context.resetPassword(values.email)
       navigate('/login')
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error sending reset link: ', error)
     }
     setLoading(false)
   }
 
   return (
-    <Container className="container-full-right">
-      <Row className="justify-content-md-center">
+    <Container fluid className="container-full-right">
+      <Row className="justify-content-md-center" style={{ width: '80%' }}>
         <Col className="form-container">
           <h3 className="text-center mb-4">Forgot Password</h3>
           <Formik
@@ -63,6 +64,7 @@ function ForgotPassword() {
                   >
                     <Form.Control
                       type="email"
+                      className="input-custom"
                       placeholder="Enter email"
                       name="email"
                       value={values.email}
@@ -77,9 +79,9 @@ function ForgotPassword() {
                 </Form.Group>
 
                 <Button
-                  variant="primary"
+                  className="mt-4 w-100 btn-custom"
+                  variant="custom"
                   type="submit"
-                  className="mt-4 w-100"
                   disabled={loading}
                 >
                   Send reset link!
@@ -87,6 +89,20 @@ function ForgotPassword() {
               </Form>
             )}
           </Formik>
+          <Container
+            fluid
+            className="mt-3"
+            style={{
+              textAlign: 'center',
+              display: 'flex',
+              padding: '0',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Link style={{ textDecoration: 'none' }} to="/login">
+              Already have an account? Login
+            </Link>
+          </Container>
         </Col>
       </Row>
     </Container>

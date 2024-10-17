@@ -29,8 +29,8 @@ const VerificationPage = () => {
           <Button
             onClick={handleSendVerificationEmail}
             disabled={loading}
-            variant="primary"
-            className="mx-3"
+            className="mx-3 btn-custom"
+            variant="custom"
           >
             {loading ? (
               <>
@@ -50,8 +50,8 @@ const VerificationPage = () => {
           <Button
             onClick={() => context.logout(true)}
             disabled={loading}
-            variant="primary"
-            className="mx-3"
+            className="mx-3 btn-custom"
+            variant="custom"
           >
             Sign Out
           </Button>

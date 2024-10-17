@@ -30,10 +30,11 @@ function Login() {
   }
 
   return (
-    <Container className="container-full-right">
-      <Row className="justify-content-md-center">
+    <Container fluid className="container-full-right">
+      <Row className="justify-content-md-center" style={{ width: '80%' }}>
         <Col className="form-container">
-          <h3 className="text-center mb-4">Login</h3>
+          <h3 className="text-center">Welcome Back!</h3>
+          <p className="text-center mb-4">Enter your details to log in</p>
           <Formik
             initialValues={{ email: '', password: '' }}
             validationSchema={loginSchema}
@@ -57,6 +58,7 @@ function Login() {
                       type="email"
                       placeholder="Enter email"
                       name="email"
+                      className="input-custom"
                       value={values.email}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -74,6 +76,7 @@ function Login() {
                       type="password"
                       placeholder="Password"
                       name="password"
+                      className="input-custom"
                       value={values.password}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -86,9 +89,9 @@ function Login() {
                 </Form.Group>
 
                 <Button
-                  variant="primary"
                   type="submit"
-                  className="mt-4 w-100"
+                  className="mt-4 w-100 btn-custom"
+                  variant="custom"
                   disabled={loading}
                 >
                   {loading ? 'Logging in...' : 'Login'}
@@ -96,12 +99,22 @@ function Login() {
               </Form>
             )}
           </Formik>
-          <Container style={{ textAlign: 'center' }}>
-            <p>
-              New User? <Link to="/register">Register Now</Link>
-              <br />
-              <Link to="/forgot-password">Forgot Password</Link>
-            </p>
+          <Container
+            fluid
+            className="mt-3"
+            style={{
+              textAlign: 'center',
+              display: 'flex',
+              padding: '0',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Link style={{ textDecoration: 'none' }} to="/forgot-password">
+              Forgot your Password?
+            </Link>
+            <Link style={{ textDecoration: 'none' }} to="/register">
+              Register Now
+            </Link>
           </Container>
         </Col>
       </Row>

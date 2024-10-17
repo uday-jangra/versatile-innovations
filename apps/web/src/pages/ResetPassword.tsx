@@ -81,8 +81,8 @@ function ResetPassword() {
   }
 
   return (
-    <Container className="container-full-right">
-      <Row className="justify-content-md-center">
+    <Container fluid className="container-full-right">
+      <Row className="justify-content-md-center" style={{ width: '80%' }}>
         <Col className="form-container">
           {loading && <Loader />}
           {!loading && verified && (
@@ -108,6 +108,7 @@ function ResetPassword() {
                           type="password"
                           placeholder="Password"
                           name="password"
+                          className="input-custom"
                           value={values.password}
                           onChange={handleChange}
                           onBlur={handleBlur}
@@ -131,6 +132,7 @@ function ResetPassword() {
                           type="password"
                           placeholder="Confirm Password"
                           name="confirmPassword"
+                          className="input-custom"
                           value={values.confirmPassword}
                           onChange={handleChange}
                           onBlur={handleBlur}
@@ -145,9 +147,9 @@ function ResetPassword() {
                     </Form.Group>
 
                     <Button
-                      variant="primary"
+                      className="mt-4 w-100 btn-custom"
+                      variant="custom"
                       type="submit"
-                      className="mt-4 w-100"
                       disabled={loading}
                     >
                       {loading ? 'Loading..' : 'Reset'}

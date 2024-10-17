@@ -174,7 +174,7 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
         await verifyPasswordResetCode(firebaseAuth, code)
         await logout(false)
         toast.success('Code Verified! Please enter new password')
-      } catch (err: any) {
+      } catch (err) {
         if (err instanceof FirebaseError) {
           if (err.code === 'auth/expired-action-code') {
             toast.error('The code is expired. Please request a new one.')
