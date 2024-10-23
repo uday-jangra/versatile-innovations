@@ -111,7 +111,7 @@ function NavbarWithAvatar({ children }: Props) {
                     </Link>
                     <Link
                       style={{ textDecoration: 'none', padding: '10px 0px' }}
-                      to="#"
+                      to="/app/profile"
                       onClick={() => setOpen(false)}
                     >
                       Profile Settings

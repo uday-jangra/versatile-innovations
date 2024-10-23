@@ -1,6 +1,6 @@
 import { Router, Response } from 'express'
 import { IRequest } from '../app'
-import UserService, { ICreateUserDetails } from '../service/user.service'
+import UserService, { ICreateUserDetails,IUpdateUserDetails } from '../service/user.service'
 
 const authRouter = Router()
 
@@ -37,5 +37,22 @@ authRouter.post('/createUser', async (req: IRequest, res: Response) => {
     res.status(400).json({ message: err.message })
   }
 })
+
+authRouter.put('/updateUser', async (req: IRequest, res: Response) => {
+  try {
+    console.log(req.body);
+    const data = req.body as IUpdateUserDetails;
+    if (!data.firstName || !data.lastName || !data.age) {
+      throw new Error("input validation failed");
+    }
+
+    const updatedUser = await UserService.updateUser(req.user, req.body);
+    res.json(updatedUser);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: err.message });
+  }
+});
+
 
 export default authRouter
