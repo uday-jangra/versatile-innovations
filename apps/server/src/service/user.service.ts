@@ -7,6 +7,12 @@ export interface ICreateUserDetails {
   age: number;
 }
 
+export interface IUpdateUserDetails{
+  firstName: string;
+  lastName: string;
+  age: number;
+}
+
 class UserService {
   static async getUser(userId: string) {
     try {
@@ -57,6 +63,30 @@ class UserService {
       throw new Error(err.message)
     }
   }
+  static async updateUser(user: DecodedIdToken, details: IUpdateUserDetails) {
+    try {
+      const updatedUser = await UserModel.findOneAndUpdate(
+        { fireBaseId: user.uid },
+        {
+          email: user.email,
+          firstName: details.firstName,
+          lastName: details.lastName,
+          age: details.age
+        },
+        { new: true, runValidators: true }
+      )
+  
+      if (!updatedUser) {
+        throw new Error('User not found');
+      }
+  
+      return updatedUser;
+    } catch (err) {
+      throw new Error(err.message);
+    }
+  }
+  
+
 }
 
 export default UserService

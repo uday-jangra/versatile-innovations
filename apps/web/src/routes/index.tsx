@@ -9,6 +9,7 @@ import UserDetailsForm from '../pages/UserDetailsForm.tsx'
 import ForgotPassword from '../pages/ForgotPassword.tsx'
 import Verify from '../pages/Verify.tsx'
 import Subject from '../pages/Subject.tsx'
+import UserProfile from '../pages/UserProfile.tsx'
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
         path: 'subject/:id',
         element: <Subject />,
       },
+      {
+        path: 'profile',
+        element:<UserProfile/>
+      }
     ],
   },
   {

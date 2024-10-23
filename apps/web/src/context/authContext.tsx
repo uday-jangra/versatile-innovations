@@ -40,6 +40,12 @@ export const UserContext = createContext<{
     lastName: string,
     age: number
   ) => Promise<void>
+  updateUserDetails: () => Promise<void>
+  updateUser:(
+    firstName: string,
+    lastName: string,
+    age:number
+  ) => Promise <void>
 }>({
   user: null,
   userDetails: null,
@@ -53,6 +59,8 @@ export const UserContext = createContext<{
   verifyResetCode: async () => {},
   isFirstTimeUser: true,
   createUser: async () => {},
+  updateUserDetails: async () => {},
+  updateUser: async() => {}
 })
 
 export const useUser = () => {
@@ -237,6 +245,58 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
     }
   }, [])
 
+  const updateUserDetails = useCallback(async () => {
+    if(user) {
+      const userDetails = await getUserDetails(user);
+      if (userDetails?.data.exists) {
+        setUserDetails({
+          firstName: userDetails.data.user.firstName,
+          lastName: userDetails.data.user.lastName,
+          age: userDetails.data.user.age,
+          points: userDetails.data.user.points,
+          score: userDetails.data.user.score,
+          fullName: `${userDetails.data.user.firstName} ${userDetails.data.user.lastName}`
+        })
+      }
+    }
+  }, [])
+
+  const updateUser = useCallback(
+    async (firstName: string, lastName: string, age: number) => {
+      try {
+        const updatedUser = await axios.put(
+          import.meta.env.VITE_API_URL + 'auth/updateUser',
+          {
+            fireBaseId: user?.uid, 
+            firstName,
+            lastName,
+            age,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${await user?.getIdToken()}`,
+            },
+          }
+        )
+
+        setUserDetails({
+          firstName: updatedUser.data.firstName,
+          lastName: updatedUser.data.lastName,
+          age: updatedUser.data.age,
+          points: updatedUser.data.points,
+          score: updatedUser.data.score,
+          fullName: `${updatedUser.data.firstName} ${updatedUser.data.lastName}`,
+        })
+        setIsFirstTimeUser(false)
+        toast.success('User updated successfully')
+      } catch (err: any) {
+        console.log(err)
+        toast.error(err.message)
+      }
+    },
+    [user]
+  )
+
   const createUser = useCallback(
     async (firstName: string, lastName: string, age: number) => {
       try {
@@ -319,6 +379,8 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
         verifyEmailCode,
         createUser,
         verifyResetCode,
+        updateUserDetails,
+        updateUser
       }}
     >
       {isLoading ? <Loader /> : children}
