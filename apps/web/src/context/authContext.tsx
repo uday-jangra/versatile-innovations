@@ -69,6 +69,7 @@ export interface UserDetails {
   age: number
   points: number
   score: number
+  fullName: string
 }
 
 type Props = { children: React.ReactNode }
@@ -259,6 +260,7 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
           age: createdUser.data.age,
           points: createdUser.data.points,
           score: createdUser.data.score,
+          fullName: `${createdUser.data.firstName} ${createdUser.data.lastName}`,
         })
         setIsFirstTimeUser(false)
         toast.success('Registration Success')
@@ -285,6 +287,7 @@ export const UserContextProviderWrapper = ({ children }: Props) => {
             age: userDetails.data.user.age,
             points: userDetails.data.user.points,
             score: userDetails.data.user.score,
+            fullName: `${userDetails.data.user.firstName} ${userDetails.data.user.lastName}`,
           })
         }
       } else {
