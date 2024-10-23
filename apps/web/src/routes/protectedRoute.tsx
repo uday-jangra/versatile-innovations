@@ -31,8 +31,9 @@ const ProtectedRoute = () => {
   }
   return (
     <>
-      <NavbarWithAvatar />
-      <Outlet />
+      <NavbarWithAvatar>
+        <Outlet />
+      </NavbarWithAvatar>
     </>
   )
 }

@@ -7,6 +7,7 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import './App.css'
 import './css/button.css'
+import 'bootstrap-icons/font/bootstrap-icons.css'
 
 createRoot(document.getElementById('root')!).render(
   <AuthContextProvider>

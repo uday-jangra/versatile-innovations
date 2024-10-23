@@ -15,5 +15,8 @@
     "concurrently": "^9.0.1",
     "husky": "^9.1.6",
     "lint-staged": "^15.2.10"
+  },
+  "dependencies": {
+    "bootstrap-icons": "^1.11.3"
   }
 }

@@ -8,6 +8,7 @@ import VerificationPage from '../pages/VerificationPage.tsx'
 import UserDetailsForm from '../pages/UserDetailsForm.tsx'
 import ForgotPassword from '../pages/ForgotPassword.tsx'
 import Verify from '../pages/Verify.tsx'
+import Subject from '../pages/Subject.tsx'
 
 const router = createBrowserRouter([
   {
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: 'dashboard',
         element: <Dashboard />,
+      },
+      {
+        path: 'subject/:id',
+        element: <Subject />,
       },
     ],
   },
